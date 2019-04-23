@@ -1,19 +1,25 @@
 // Copyright [2018] Alibaba Cloud All rights reserved
-#ifndef ENGINE_RACE_ENGINE_RACE_H_
-#define ENGINE_RACE_ENGINE_RACE_H_
+#ifndef ENGINE_EXAMPLE_ENGINE_EXAMPLE_H_
+#define ENGINE_EXAMPLE_ENGINE_EXAMPLE_H_
+#include <pthread.h>
 #include <string>
 #include "include/engine.h"
+#include "util.h"
+#include "door_plate.h"
+#include "data_store.h"
 
 namespace polar_race {
 
-class EngineRace : public Engine  {
+class EngineExample : public Engine  {
  public:
   static RetCode Open(const std::string& name, Engine** eptr);
 
-  explicit EngineRace(const std::string& dir) {
-  }
+  explicit EngineExample(const std::string& dir)
+    : mu_(PTHREAD_MUTEX_INITIALIZER),
+    db_lock_(NULL), plate_(dir), store_(dir) {
+    }
 
-  ~EngineRace();
+  ~EngineExample();
 
   RetCode Write(const PolarString& key,
       const PolarString& value) override;
@@ -21,18 +27,17 @@ class EngineRace : public Engine  {
   RetCode Read(const PolarString& key,
       std::string* value) override;
 
-  /*
-   * NOTICE: Implement 'Range' in quarter-final,
-   *         you can skip it in preliminary.
-   */
   RetCode Range(const PolarString& lower,
       const PolarString& upper,
       Visitor &visitor) override;
 
- private: 
-
+ private:
+  pthread_mutex_t mu_;
+  FileLock* db_lock_;
+  DoorPlate plate_;
+  DataStore store_;
 };
 
 }  // namespace polar_race
 
-#endif  // ENGINE_RACE_ENGINE_RACE_H_
+#endif  // ENGINE_EXAMPLE_ENGINE_EXAMPLE_H_

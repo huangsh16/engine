@@ -5,6 +5,8 @@
 #include <map>
 #include "util.h"
 #include "engine_example.h"
+#include <iostream>
+#include <stdio.h>
 
 namespace polar_race {
 
